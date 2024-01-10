@@ -1,19 +1,19 @@
 # syntax=docker/dockerfile:1
-ARG GO_VERSION=1.21
+ARG GO_VERSION=1.22-rc
 ARG GOLANGCI_LINT_VERSION=latest-alpine
 
-FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS base
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION} AS deps
 ENV GOMODCACHE=/go/pkg/mod/
 ENV GOCACHE=/.cache/go-build/
-WORKDIR /src!
-RUN --mount=type=bind,target=go.mod,source=go.mod \
-    --mount=type=bind,target=go.sum,source=go.sum \
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=${GOMODCACHE} \
+    --mount=type=cache,target=${GOCACHE} \
     go mod download -x
 
-FROM base AS build
+FROM deps AS build
 ARG TARGETOS
 ARG TARGETARCH
 RUN --mount=type=cache,target=${GOMODCACHE} \
     --mount=type=cache,target=${GOCACHE} \
-    --mount=type=bind,target=. \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build ./...
+    CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build ./...
