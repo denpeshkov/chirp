@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 ARG GO_VERSION=1.22-rc
-ARG GOLANGCI_LINT_VERSION=latest-alpine
+ARG GOLANGCI_LINT_VERSION=v1.55.2
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION} AS deps
 ENV GOMODCACHE=/go/pkg/mod/
@@ -14,6 +14,8 @@ RUN --mount=type=cache,target=${GOMODCACHE} \
 FROM deps AS build
 ARG TARGETOS
 ARG TARGETARCH
+WORKDIR /src
+COPY . .
 RUN --mount=type=cache,target=${GOMODCACHE} \
     --mount=type=cache,target=${GOCACHE} \
     CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build ./...
