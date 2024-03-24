@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
-ARG GO_VERSION=1.22-rc
-ARG GOLANGCI_LINT_VERSION=v1.55.2
+ARG GO_VERSION=latest
+ARG GOLANGCI_LINT_VERSION=latest-alpine
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION} AS deps
 ENV GOMODCACHE=/go/pkg/mod/
