@@ -19,6 +19,7 @@ out/
 go.work
 testdata/
 bin/
+cover.out
 
 ### VSCode
 
